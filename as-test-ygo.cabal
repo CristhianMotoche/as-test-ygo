@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2818e0d710b38eade0a2445c9fc8629c9d7955869432d1dedf64aed817caf8fa
+-- hash: 3ab3a458d148031ff9b022f0e076d3970d416d89718881f23d022268cef87fc9
 
 name:           as-test-ygo
 version:        0.1.0.0
@@ -30,4 +30,5 @@ executable as-test-ygo-exe
     , aeson-schemas
     , base >=4.7 && <5
     , bytestring
+    , text
   default-language: Haskell2010

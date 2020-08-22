@@ -1,12 +1,14 @@
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module Main where
 
 import qualified Data.Aeson           as A
-import           Data.Aeson.Schema    (Object, schema)
+import           Data.Aeson.Schema    (Object, get, schema)
 import qualified Data.ByteString.Lazy as BS
+import qualified Data.Text.IO         as T
 
 type Data = [schema|
   {
@@ -28,7 +30,7 @@ type Card = [schema|
     archetype: Text,
     card_sets: List #CardSet,
     card_images: List #CardImage,
-    card_prices: List #CardPrices,
+    card_prices: List #CardPrice,
   }
 |]
 
@@ -50,7 +52,7 @@ type CardImage = [schema|
   }
 |]
 
-type CardPrices = [schema|
+type CardPrice = [schema|
   {
     cardmarket_price: Text,
     tcgplayer_price: Text,
@@ -61,8 +63,26 @@ type CardPrices = [schema|
 |]
 
 
+printCardInfo :: Object Card -> IO ()
+printCardInfo card = do
+  putStrLn $ "id: " ++ show [get| card.id |]
+  putStrLn $ "name: " ++ show [get| card.name |]
+  putStrLn $ mconcat [
+    "atk: ", show [get| card.atk |], " ",
+    "def: ", show [get| card.def |]
+    ]
+  T.putStrLn $ mconcat $
+    ["Small image url: "] ++ [get| card.card_images[].image_url_small |]
+  putStrLn $
+    "Price In Coolstuff.inc: " ++ show [get| card.card_prices[].coolstuffinc_price |]
+
+
 main :: IO ()
 main =
   let decodeStr :: BS.ByteString -> Either String (Object Data)
       decodeStr = A.eitherDecode
-   in BS.readFile "time-wizard.json" >>= print . decodeStr
+   in do
+     eData <- decodeStr <$> BS.readFile "time-wizard.json"
+     case eData of
+       Left str  -> putStrLn $ "Error: " ++ str
+       Right dat -> mapM_ printCardInfo [get| dat.data[] |]

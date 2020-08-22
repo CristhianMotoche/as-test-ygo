@@ -9,6 +9,7 @@ dependencies:
 - bytestring
 - aeson
 - aeson-schemas
+- text
 
 executables:
   as-test-ygo-exe:
